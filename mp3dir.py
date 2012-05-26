@@ -1,13 +1,10 @@
 # Mp3 find/filter utilities
-# Collections of songs are represented by lists of tuples (path, filename)
+# Collections of songs are represented as a list of tuples (path, filename)
 
 from werkzeug.contrib.cache import SimpleCache
 import os
 
 cache = SimpleCache()
-
-# TODO config module?
-MP3_DIR = "/home/mattias/mp3/"
 
 def list_files(top):
     """Generate (path, file) tuples for all files under directory top.
@@ -18,14 +15,11 @@ def list_files(top):
         for file in files:
             yield (root, file.decode('utf-8', 'replace'))
 
-def files(nocache):
+def files(root, nocache):
     """Find (path, file) tuples, cached for 5 min."""
     rv = cache.get('files')
     if rv is None or nocache:
-        rv = list(list_files(MP3_DIR))
-        # rv = defaultdict(list)
-        # for path, file in list_files(MP3_DIR):
-        #     rv[path].append(file)
+        rv = list(list_files(root))
         cache.set('files', rv, timeout=5 *60)
     return rv
 
@@ -33,9 +27,9 @@ def match(s, q):
     """Find out if s matches the query q."""
     return s.lower().find(q.lower()) != -1
 
-def find_matching(q, nocache):
-    """Find (path, file) tuples matching query q."""
+def find_matching(root, q, nocache):
+    """Find (path, file) tuples matching query q under directory root."""
     # TODO fuzzy matching with multiple query words
     # TODO ID3 support?
-    return filter(lambda (p, f): match(p, q) or match(f, q), files(nocache))
+    return filter(lambda (p, f): match(p, q) or match(f, q), files(root, nocache))
 

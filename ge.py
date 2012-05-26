@@ -8,10 +8,10 @@ from collections import defaultdict
 import json
 
 app = Flask(__name__)
-app.debug = True
+app.config.from_pyfile('application.cfg')
 
 def nocache(f):
-    """Cache-disabling decorator."""
+    """Decorator that disables http caching."""
     def new_func(*args, **kwargs):
         resp = make_response(f(*args, **kwargs))
         resp.cache_control.no_cache = True
@@ -28,7 +28,8 @@ def lsmp3():
     q = request.args.get('q', '')
     limit = request.args.get('limit', None, type=int)
     nocache = request.args.get('nocache', False, type=bool)
-    matches = mp3dir.find_matching(q, nocache)
+
+    matches = mp3dir.find_matching(app.config['MP3ROOT'], q, nocache)
     limited = matches[0:limit]
     stats = (len(limited), len(matches))
     
@@ -37,7 +38,6 @@ def lsmp3():
     for p, f in limited:
         d[p].append(f)
     result = json.dumps(d, indent=4)
-    #result = '\n'.join(repr(p) for p in d.iteritems())
     result += "\n(displayed, total) = %s" % (stats,)
     return result
 
