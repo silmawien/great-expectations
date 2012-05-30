@@ -29,7 +29,9 @@ def match(s, q):
 
 def find_matching(root, q, nocache):
     """Find (path, file) tuples matching query q under directory root."""
-    # TODO fuzzy matching with multiple query words
     # TODO ID3 support?
-    return filter(lambda (p, f): match(p, q) or match(f, q), files(root, nocache))
+    rv = files(root, nocache)
+    for term in q.split():
+        rv = filter(lambda (p, f): match(p, term) or match(f, term), rv);
+    return rv
 
