@@ -11,28 +11,24 @@
         }
         var query = $("#q").val();
         if (query) {
-            lookup(query, 10);
+            lookup({q: query, limit: 10});
         }
     });
 
-    // serialized, cached ajax query
-    var lookup = mkcache1(mkserial(function(next, query, limit) {
-        var params = { q: query }
-        if (limit) {
-           params.limit = limit;
-        } else {
-           params.nocache = "true";
-        }
-
-        $.get("/lsmp3", params, function(data) {
-            $("#pre").html(data);
-            next();
-        });
+    // cached and serialized version of $.get(url, params, success)
+    var csGet = mkcache1(mkserial(function(next, url, params, success) {
+        return $.get(url, params, success).complete(next);
     }));
+
+    function lookup(params) {
+        csGet("/lsmp3", params, function(data) {
+            $("#pre").html(data);
+        });
+    }
 
     function fullSearch() {
         var query = $("#q").val();
-        lookup(query);
+        lookup({q: query, nocache: true});
         return false;
     }
 
