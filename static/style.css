@@ -1,3 +1,31 @@
 #pre {
     background: #a0c0f0;
 }
+
+h1 {
+    font-family: 'Mystery Quest', cursive;
+}
+
+body {
+    font-family: 'Questrial2', sans-serif;
+}
+
+h1 {
+}
+
+.category {
+    background-color: #d0e0f0;
+}
+
+input {
+    font-size: 20px;
+    margin: auto;
+    padding-left: 30px;
+    background-image: url('/static/search.png');
+    background-position: 5px center;
+    background-repeat: no-repeat;
+}
+
+.busy {
+    background-image: url('/static/loader.gif');
+}

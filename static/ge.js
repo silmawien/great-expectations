@@ -3,9 +3,10 @@
     // event handlers
     //
 
-    $("#f").submit(fullSearch);
+    //$("#f").submit(fullSearch);
     $("#q").keyup(function(e) {
         if (e.which == 13) {
+            fullSearch();
             //e.preventDefault();
             return;
         }
@@ -15,14 +16,34 @@
         }
     });
 
+    function progressControl(inProgress) {
+        $("#q").toggleClass("busy", inProgress);
+    }
+
     // cached and serialized version of $.get(url, params, success)
     var csGet = mkcache1(mkserial(function(next, url, params, success) {
-        return $.get(url, params, success).complete(next);
-    }));
+        return $.get(url, params, function(data) {
+            success(data);
+        }).complete(next);
+    }, progressControl));
 
     function lookup(params) {
         csGet("/lsmp3", params, function(data) {
-            $("#pre").html(data);
+            var json = JSON.parse(data);
+            var hits = $("#hits");
+            $("#stats").text(json.stats[0] + " / " + json.stats[1]);
+            hits.html("");
+            $.each(json.results, function(key, value) {
+                if (key == "") key = "/";
+                $('<div class="category"/>').text(key).appendTo(hits);
+
+                $.each(value, function(index, song) {
+                    display = song[0];
+                    filepath = song[1];
+                    $('<div class="song"/>').data('fp', filepath).text(display).appendTo(hits);
+                });
+            });
+            //$("#pre").html(data);
         });
     }
 
@@ -51,7 +72,7 @@
     // Given an async function f(next, ...), return a new function f'(...)
     // which will serialize calls. You must call next() before returning from
     // f.
-    function mkserial(f) {
+    function mkserial(f, progressIndicator) {
         var state = {
             queued: null,      // queued arguments
             that: null,        // queued context
@@ -71,6 +92,7 @@
             } else {
                 // all done
                 state.inProgress = false;
+                progressIndicator(false);
             }
         }
         var wrapper = function() {
@@ -81,6 +103,7 @@
             } else {
                 // start new
                 state.inProgress = true;
+                progressIndicator(true);
 
                 var args = Array.prototype.slice.call(arguments);
                 args.unshift(next);
