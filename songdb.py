@@ -52,10 +52,12 @@ def rebuild_index(root):
                 info['album'] = tags.album
                 info['title'] = tags.title
                 info['track'] = tags.track
-                info['idx'] = ' '.join([tags.artist, tags.album,
-                       tags.title, filepath.decode('utf-8', 'ignore')])
-                newidx[filepath] = info
-                print "Adding", filepath
+            else:
+                info = { 'artist': '', 'album': '', 'title': '', 'track': 0 }
+            info['idx'] = ' '.join([tags.artist, tags.album,
+                   tags.title, filepath.decode('utf-8', 'ignore')])
+            newidx[filepath] = info
+            print "Adding", filepath
     for k in oldidx:
         if k not in newidx:
             print "Discarding", k

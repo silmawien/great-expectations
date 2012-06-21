@@ -3,11 +3,19 @@
     // event handlers
     //
 
-    //$("#f").submit(fullSearch);
+    var blockProcessKey = false;
+
     $("#q").keyup(function(e) {
+        if (blockProcessKey) {
+            return;
+        }
         if (e.which == 13) {
             fullSearch();
-            //e.preventDefault();
+            // workaround for IMEs that send 229 after enter
+            blockProcessKey = true;
+            setTimeout(function() {
+                blockProcessKey = false;
+            }, 500);
             return;
         }
         var query = $("#q").val();
@@ -27,20 +35,32 @@
         }).complete(next);
     }, progressControl));
 
+    function toast(item, data) {
+        item.css("padding-left", "+=20");
+        item.animate({ "padding-left": "-=20" }, "fast");
+    }
+
     function lookup(params) {
         csGet("/lsmp3", params, function(data) {
-            var json = JSON.parse(data);
+            $("#stats").text(data.stats[0] + " / " + data.stats[1]);
             var hits = $("#hits");
-            $("#stats").text(json.stats[0] + " / " + json.stats[1]);
             hits.html("");
-            $.each(json.results, function(key, value) {
+            $.each(data.results, function(key, value) {
                 if (key == "") key = "/";
                 $('<div class="category"/>').text(key).appendTo(hits);
 
                 $.each(value, function(index, song) {
-                    display = song[0];
-                    filepath = song[1];
-                    $('<div class="song"/>').data('fp', filepath).text(display).appendTo(hits);
+                    var display = song[0];
+                    var filepath = song[1];
+                    var item = $('<div class="song"/>')
+                    item.data('fp', filepath)
+                    item.text(display)
+                    item.click(function() {
+                        $.get("/click", { fp: item.data('fp') }, function(data) {
+                            toast(item, data);
+                        });
+                    });
+                    item.appendTo(hits);
                 });
             });
             //$("#pre").html(data);
@@ -49,7 +69,7 @@
 
     function fullSearch() {
         var query = $("#q").val();
-        lookup({q: query, nocache: true});
+        lookup({q: query});
         return false;
     }
 
@@ -70,8 +90,7 @@
     }
 
     // Given an async function f(next, ...), return a new function f'(...)
-    // which will serialize calls. You must call next() before returning from
-    // f.
+    // which must call next() explicitly to allow further calls to occur.
     function mkserial(f, progressIndicator) {
         var state = {
             queued: null,      // queued arguments

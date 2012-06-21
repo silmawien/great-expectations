@@ -29,3 +29,8 @@ input {
 .busy {
     background-image: url('/static/loader.gif');
 }
+
+.song {
+    font-size: 28px;
+    margin: 5px;
+}
