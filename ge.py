@@ -28,8 +28,24 @@ def click():
     if filepath:
         filepath = filepath.decode('string_escape')
         path = os.path.join(app.config['MP3ROOT'], filepath)
-        redis.rpush(app.config['REDIS_QUEUE_KEY'], pickle.dumps(path))
+        cmd = 'loadfile "%s" 1\n' % path
+        redis.rpush(app.config['REDIS_QUEUE_KEY'], pickle.dumps(cmd))
     return "Track queued"
+
+@app.route('/stop')
+@nocache
+def stop():
+    cmd = 'stop\n'
+    redis.rpush(app.config['REDIS_QUEUE_KEY'], pickle.dumps(cmd))
+    return ""
+
+@app.route('/step')
+def step():
+    value = request.args.get('value', None, int)
+    if value:
+        cmd = 'pt_step %s\n' % value
+        redis.rpush(app.config['REDIS_QUEUE_KEY'], pickle.dumps(cmd))
+    return ""
 
 @app.route('/lsmp3')
 @nocache

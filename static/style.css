@@ -20,6 +20,8 @@ h1 {
 input {
     font-size: 20px;
     margin: auto;
+}
+input[type="text"] {
     padding-left: 30px;
     background-image: url('/static/search.png');
     background-position: 5px center;

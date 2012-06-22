@@ -24,6 +24,18 @@
         }
     });
 
+    $("#s").click(function(e) {
+        $.get("/stop", {}, function(data) {});
+    });
+
+    $("#next").click(function(e) {
+        $.get("/step", { value: 1 }, function(data) {});
+    });
+
+    $("#prev").click(function(e) {
+        $.get("/step", { value: -1 }, function(data) {});
+    });
+
     function progressControl(inProgress) {
         $("#q").toggleClass("busy", inProgress);
     }
