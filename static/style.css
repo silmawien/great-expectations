@@ -13,15 +13,32 @@ body {
 h1 {
 }
 
+#content {
+    margin-top: 65px;
+}
+
+#controls {
+    position: fixed;
+    top: 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    left: 0;
+    right: 0;
+    background-color: black;
+    text-align: center;
+}
+
 .category {
     background-color: #d0e0f0;
 }
 
-input {
+input.control {
+    font-size: 25px;
+}
+
+input[type="text"] {
     font-size: 20px;
     margin: auto;
-}
-input[type="text"] {
     padding-left: 30px;
     background-image: url('/static/search.png');
     background-position: 5px center;
