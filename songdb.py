@@ -54,8 +54,9 @@ def rebuild_index(root):
                 info['track'] = tags.track
             else:
                 info = { 'artist': '', 'album': '', 'title': '', 'track': 0 }
+
             info['idx'] = ' '.join([tags.artist, tags.album,
-                   tags.title, filepath.decode('utf-8', 'ignore')])
+                   tags.title, filepath.decode('utf-8', 'ignore')]).lower()
             newidx[filepath] = info
             print "Adding", filepath
     for k in oldidx:
@@ -68,8 +69,9 @@ def upgrade(root):
     oldidx = read_index(root)
     # do stuff
     for filepath, info in oldidx.items():
-        info['idx'] = ' '.join([info['artist'], info['album'],
-                info['title'], filepath.decode('utf-8', 'ignore')])
+        info['idx'] = info['idx'].lower()
+        #info['idx'] = ' '.join([info['artist'], info['album'],
+        #        info['title'], filepath.decode('utf-8', 'ignore')])
     write_index(root, oldidx)
 
 
@@ -82,9 +84,10 @@ def get_index(root, nocache):
 
 def mkmatcher(q):
     """Create a matcher predicate (index entry -> boolean) for query q."""
+    lowq = q.lower()
     def matcher(kv):
         _, info = kv
-        return info['idx'].lower().find(q.lower()) != -1
+        return info['idx'].find(lowq) != -1
     return matcher
 
 def list_matching(root, q, nocache):
