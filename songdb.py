@@ -27,38 +27,41 @@ def write_index(path, idx):
         pickle.dump(idx, f)
 
 def list_song_files(root):
-    """Get pairs of (path, filename) for all songs under directory root."""
+    """Get relative path to all songs under root.
+    Example: /root/dir/song.mp3 -> dir/song.mp3
+    """
     for path, _, files in os.walk(root):
         for f in files:
             _, ext = os.path.splitext(f)
             if ext in AUDIO_FILES:
-                yield os.path.relpath(path, root), f
+                yield os.path.join(os.path.relpath(path, root), f)
+
+def mkentry(tags, filepath):
+    """Create new entry for the metadata dict."""
+    if tags.valid:
+        info = {}
+        info['artist'] = tags.artist
+        info['album'] = tags.album
+        info['title'] = tags.title
+        info['track'] = tags.track
+    else:
+        info = { 'artist': '', 'album': '', 'title': '', 'track': 0 }
+
+    info['idx'] = ' '.join([tags.artist, tags.album,
+           tags.title, filepath.decode('utf-8', 'ignore')]).lower()
+    return info
 
 def rebuild_index(root):
     """Incrementally update the index in directory root."""
-    import pprint
     oldidx = read_index(root)
     newidx = {}
-    for path, name in list_song_files(root):
-        abspath = os.path.join(root, path, name)
-        filepath = os.path.join(path, name)
+    for filepath in list_song_files(root):
         if filepath in oldidx:
             newidx[filepath] = oldidx[filepath]
         else:
-            tags = auto.File(abspath)
-            if tags.valid:
-                info = {}
-                info['artist'] = tags.artist
-                info['album'] = tags.album
-                info['title'] = tags.title
-                info['track'] = tags.track
-            else:
-                info = { 'artist': '', 'album': '', 'title': '', 'track': 0 }
-
-            info['idx'] = ' '.join([tags.artist, tags.album,
-                   tags.title, filepath.decode('utf-8', 'ignore')]).lower()
-            newidx[filepath] = info
             print "Adding", filepath
+            tags = auto.File(os.path.join(root, filepath))
+            newidx[filepath] = mkentry(tags, filepath)
     for k in oldidx:
         if k not in newidx:
             print "Discarding", k
