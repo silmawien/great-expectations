@@ -47,12 +47,15 @@ def step():
         redis.rpush(app.config['REDIS_QUEUE_KEY'], pickle.dumps(cmd))
     return ""
 
+def string2bool(s):
+    return s.lower() in ['t', 'true', '1']
+
 @app.route('/lsmp3')
 @nocache
 def lsmp3():
     q = request.args.get('q', '')
     limit = request.args.get('limit', None, type=int)
-    nocache = request.args.get('nocache', False, type=bool)
+    nocache = request.args.get('nocache', False, type=string2bool)
 
     matches = songdb.list_matching(app.config['MP3ROOT'], q, nocache)
     limited = matches[0:limit]

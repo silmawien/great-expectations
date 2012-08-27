@@ -81,7 +81,7 @@
 
     function fullSearch() {
         var query = $("#q").val();
-        lookup({q: query, nocache: true});
+        lookup({q: query});
         return false;
     }
 
