@@ -13,12 +13,12 @@ body {
 h1 {
 }
 
-#content {
+/*#content {
     margin-top: 65px;
-}
+}*/
 
 #controls {
-    position: fixed;
+    /*position: fixed;*/
     top: 0px;
     padding-top: 10px;
     padding-bottom: 10px;
@@ -50,6 +50,6 @@ input[type="text"] {
 }
 
 .song {
-    font-size: 28px;
+    font-size: 23px;
     margin: 5px;
 }

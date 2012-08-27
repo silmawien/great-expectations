@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.js"></script>
@@ -8,18 +9,17 @@
     </head>
     <body>
         <div id="controls">
+            <input type="text" id="q" autocomplete="off" autofocus />
             <input class="control" type="button" value="&#x25C1;" id="prev" />
             <input class="control" type="button" value="&#x25EF;" id="s" />
             <input class="control" type="button" value="&#x25B7;" id="next" />
         </div>
         <div id="content">
-            <h1>Great Expectations</h1>
-            <input type="text" id="q" autocomplete="off" autofocus />
             <p id="stats"></p>
             <div id="hits">
             </div>
             <!--<pre id="pre">Result</pre>-->
         </div>
+        <script type="text/javascript" src="ge.js"></script>
     </body>
-    <script type="text/javascript" src="ge.js"></script>
 </html>
