@@ -1,25 +1,61 @@
 (function () {
 
+    // BB Model
+    //
+
+    /*var*/ Entry = Backbone.Model.extend({
+
+        defaults: function() {
+            return {
+                display: "no song"
+            };
+        },
+
+        initialize: function() {
+            if (!this.get("display")) {
+                this.set({"display": this.defaults.display});
+            }
+        },
+
+        clear: function() {
+            this.destroy();
+        },
+
+    });
+
+    /*var*/ Playlist = Backbone.Collection.extend({
+
+        model: Entry,
+
+        localStorage: new Store("playlist"),
+
+    });
+
+    /*var*/ playlist = new Playlist;
+
+    // BB View
+    //
+
     // event handlers
     //
 
+    // workaround for IMEs that send 229 after enter
     var blockProcessKey = false;
 
     $("#q").keyup(function(e) {
         if (blockProcessKey) {
             return;
         }
+        var query = $("#q").val();
         if (e.which == 13) {
-            fullSearch();
-            // workaround for IMEs that send 229 after enter
+            lookup({q: query});
             blockProcessKey = true;
             setTimeout(function() {
                 blockProcessKey = false;
             }, 500);
-            return;
         }
-        var query = $("#q").val();
         if (query) {
+            lastQuery = query;
             lookup({q: query, limit: 10});
         }
     });
@@ -34,6 +70,33 @@
 
     $("#prev").click(function(e) {
         $.get("/step", { value: -1 }, function(data) {});
+    });
+
+    var checked = [];
+
+    // check / uncheck song
+    $("#hits").on("change", "input", function(e) {
+        var id = e.target.id;
+        var oldIndex = checked.indexOf(id);
+        if (oldIndex != -1) {
+            checked.splice(oldIndex, 1);
+        }
+        if (e.target.checked) {
+            checked.push(id);
+        }
+    });
+
+    // enqueue checked songs
+    $("#queue-selected").click(function(e) {
+        $.each(checked, function(index, filepath) {
+            $.get("/click", { fp: filepath }, function(data) {
+                console.log("clicked: " + filepath);
+            });
+        });
+
+        // clear selection
+        $("input[name='songcb']").attr('checked', false);
+        checked = [];
     });
 
     function progressControl(inProgress) {
@@ -64,25 +127,16 @@
                 $.each(value, function(index, song) {
                     var display = song[0];
                     var filepath = song[1];
-                    var item = $('<div class="song"/>')
-                    item.data('fp', filepath)
-                    item.text(display)
-                    item.click(function() {
-                        $.get("/click", { fp: item.data('fp') }, function(data) {
-                            toast(item, data);
-                        });
-                    });
+                    var item = $('<div class="song"/>');
+                    var id = filepath;
+                    var checkbox = $('<input name="songcb" type="checkbox" id="' + id + '"/>');
+                    item.append(checkbox);
+                    item.append($('<label for="' + id + '"/>').text(display));
                     item.appendTo(hits);
                 });
             });
             //$("#pre").html(data);
         });
-    }
-
-    function fullSearch() {
-        var query = $("#q").val();
-        lookup({q: query});
-        return false;
     }
 
     // Utilities
@@ -144,32 +198,4 @@
         return wrapper;
     }
 
-    // function doit(next, cb, param1) {
-    //     setTimeout(function() {
-    //         cb(param1);
-    //         next();
-    //     }, 1000);
-    // }
-    //
-    // doitnow = mkserial(function(next, cb, param1) {
-    //     if (param1 == 1) {
-    //         doit(next, cb, param1);
-    //     } else {
-    //         cb(param1);
-    //         next();
-    //     }
-    // });
-    //
-    // // should print 1, 2, 3
-    // function testSerial() {
-    //     var pr = function(param1) { console.log(param1); };
-
-    //     doitnow(pr, 1);
-    //     doitnow(function(param1) {
-    //         pr(param1);
-    //         doitnow(pr, 3);
-    //     }, 2);
-    // }
-
-    // gtest = testSerial;
 })();

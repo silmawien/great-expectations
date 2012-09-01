@@ -61,7 +61,7 @@ def lsmp3():
     limited = matches[0:limit]
     stats = (len(limited), len(matches))
 
-    # Build dict of category -> songlist where each songlist is a tuple
+    # Build dict of category -> list of songs, where each song is a tuple
     # (displayname, filepath)
     d = defaultdict(list)
     for filepath, info in limited:
@@ -72,7 +72,8 @@ def lsmp3():
         else:
             # no metadata, use path / filename
             # strip invalid utf-8 chars so that jsonify won't choke
-            key, value = map(lambda s: s.decode('utf-8', 'replace'), os.path.split(filepath))
+            key, value = map(lambda s: s.decode('utf-8', 'replace'),
+                    os.path.split(filepath))
 
         # preserve invalid characters in filepath
         filepath = filepath.encode('string_escape')

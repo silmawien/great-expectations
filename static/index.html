@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.js"></script>
+        <script type="text/javascript" src="json2.js"></script>
+        <script type="text/javascript" src="underscore.js"></script>
+        <script type="text/javascript" src="jquery-1.8.0.js"></script>
+        <script type="text/javascript" src="backbone.js"></script>
+        <script type="text/javascript" src="backbone-localstorage.js"></script>
         <link rel="stylesheet" type="text/css" href="style.css">
         <link href='http://fonts.googleapis.com/css?family=Questrial|Mystery+Quest' rel='stylesheet' type='text/css'>
         <!-- Disable viewport scaling since we are mobile-aware. -->
@@ -9,6 +13,7 @@
     </head>
     <body>
         <div id="controls">
+            <input type="button" value="Queue" id="queue-selected" />
             <input type="text" id="q" autocomplete="off" autofocus />
             <input class="control" type="button" value="&#x25C1;" id="prev" />
             <input class="control" type="button" value="&#x25EF;" id="s" />
