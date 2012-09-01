@@ -47,15 +47,14 @@
             return;
         }
         var query = $("#q").val();
+        if (!query) return;
         if (e.which == 13) {
             lookup({q: query});
             blockProcessKey = true;
             setTimeout(function() {
                 blockProcessKey = false;
             }, 500);
-        }
-        if (query) {
-            lastQuery = query;
+        } else {
             lookup({q: query, limit: 10});
         }
     });
