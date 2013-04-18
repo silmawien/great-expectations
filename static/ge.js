@@ -1,41 +1,5 @@
 (function () {
 
-    // BB Model
-    //
-
-    /*var*/ Entry = Backbone.Model.extend({
-
-        defaults: function() {
-            return {
-                display: "no song"
-            };
-        },
-
-        initialize: function() {
-            if (!this.get("display")) {
-                this.set({"display": this.defaults.display});
-            }
-        },
-
-        clear: function() {
-            this.destroy();
-        },
-
-    });
-
-    /*var*/ Playlist = Backbone.Collection.extend({
-
-        model: Entry,
-
-        localStorage: new Store("playlist"),
-
-    });
-
-    /*var*/ playlist = new Playlist;
-
-    // BB View
-    //
-
     // event handlers
     //
 
@@ -47,14 +11,13 @@
             return;
         }
         var query = $("#q").val();
-        if (!query) return;
         if (e.which == 13) {
-            lookup({q: query});
+            lookup({q: query, nocache: "false"});
             blockProcessKey = true;
             setTimeout(function() {
                 blockProcessKey = false;
             }, 500);
-        } else {
+        } else if (query) {
             lookup({q: query, limit: 10});
         }
     });

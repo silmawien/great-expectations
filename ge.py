@@ -5,7 +5,6 @@ from flask import make_response
 from functools import update_wrapper
 import songdb
 from collections import defaultdict
-import json
 import os
 from redis import Redis
 import pickle
@@ -14,6 +13,7 @@ app = Flask(__name__)
 app.config.from_pyfile('application.cfg')
 redis = Redis()
 
+
 def nocache(f):
     """Decorator that disables http caching."""
     def new_func(*args, **kwargs):
@@ -21,6 +21,7 @@ def nocache(f):
         resp.cache_control.no_cache = True
         return resp
     return update_wrapper(new_func, f)
+
 
 @app.route('/click')
 def click():
@@ -32,12 +33,14 @@ def click():
         redis.rpush(app.config['REDIS_QUEUE_KEY'], pickle.dumps(cmd))
     return "Track queued"
 
+
 @app.route('/stop')
 @nocache
 def stop():
     cmd = 'stop\n'
     redis.rpush(app.config['REDIS_QUEUE_KEY'], pickle.dumps(cmd))
     return ""
+
 
 @app.route('/step')
 def step():
@@ -47,8 +50,10 @@ def step():
         redis.rpush(app.config['REDIS_QUEUE_KEY'], pickle.dumps(cmd))
     return ""
 
+
 def string2bool(s):
     return s.lower() in ['t', 'true', '1']
+
 
 @app.route('/lsmp3')
 @nocache
@@ -73,13 +78,13 @@ def lsmp3():
             # no metadata, use path / filename
             # strip invalid utf-8 chars so that jsonify won't choke
             key, value = map(lambda s: s.decode('utf-8', 'replace'),
-                    os.path.split(filepath))
+                             os.path.split(filepath))
 
         # preserve invalid characters in filepath
         filepath = filepath.encode('string_escape')
         d[key].append((value, filepath))
 
-    result = { "results": d, "stats": stats }
+    result = {"results": d, "stats": stats}
     return jsonify(result)
 
 if __name__ == '__main__':
@@ -91,4 +96,3 @@ if __name__ == '__main__':
 
     app.run(host='0.0.0.0', port=53789)
     #app.run(host='0.0.0.0', port=53789, processes=7)
-
